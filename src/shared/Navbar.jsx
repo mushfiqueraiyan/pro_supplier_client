@@ -1,7 +1,11 @@
 import React from "react";
-import { NavLink } from "react-router";
+import { Link, NavLink } from "react-router";
+import useAuth from "../hooks/GetAuth";
+import { User } from "lucide-react";
 
 const Navbar = () => {
+  const { user } = useAuth();
+
   const navItems = (
     <>
       <li>
@@ -57,8 +61,18 @@ const Navbar = () => {
           <ul className="menu menu-horizontal px-1">{navItems}</ul>
         </div>
         <div className="navbar-end gap-3">
-          <a className="btn rounded-lg text-gray-600">Sign In</a>
-          <a className="btn rounded-lg bg-[#CAEB66]">Be a Rider</a>
+          {user ? (
+            <div className="bg-[#CAEB66] p-2 rounded-full">
+              <User />
+            </div>
+          ) : (
+            <>
+              <Link to={"/login"} className="btn rounded-lg text-gray-600">
+                Sign In
+              </Link>
+              <Link className="btn rounded-lg bg-[#CAEB66]">Be a Rider</Link>
+            </>
+          )}
         </div>
       </div>
     </div>

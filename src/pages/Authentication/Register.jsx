@@ -1,8 +1,12 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router";
+import useAuth from "../../hooks/GetAuth";
+import { updateProfile } from "firebase/auth";
 
 const Register = () => {
+  const { createAccount, loader, setUser } = useAuth();
+
   const {
     register,
     handleSubmit,
@@ -10,7 +14,27 @@ const Register = () => {
   } = useForm();
 
   const onSubmit = (data) => {
-    console.log(data);
+    const name = data.name;
+    const email = data.email;
+    const password = data.password;
+
+    const userData = {
+      displayName: name,
+    };
+
+    createAccount(email, password)
+      .then((res) => {
+        setUser(res.user);
+        console.log(res.user);
+        updateProfile(res.user, userData)
+          .then(() => {})
+          .catch((err) => {
+            console.log(err);
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -28,6 +52,7 @@ const Register = () => {
           name="name"
           className="input w-full"
           placeholder="Full Name"
+          {...register("name")}
         />
         <label className="label">Email</label>
         <input
@@ -58,7 +83,10 @@ const Register = () => {
 
       <div className="pr-0 md:pr-0 lg:pr-30">
         <p>
-          Already have an account? <Link className="text-[#CAEB66]">Login</Link>
+          Already have an account?{" "}
+          <Link to={"/login"} className="text-[#CAEB66]">
+            Login
+          </Link>
         </p>
         <div className="text-center mt-5">
           <p>Or</p>
