@@ -8,7 +8,7 @@ import Review from "./Review";
 
 const Home = () => {
   return (
-    <div>
+    <div className="">
       <Banner />
       <Work />
       <Services />
