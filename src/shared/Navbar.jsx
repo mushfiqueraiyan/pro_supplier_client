@@ -18,7 +18,7 @@ const Navbar = () => {
         <NavLink to={"/addParcel"}>Send Parcel</NavLink>
       </li>
       <li>
-        <NavLink>Pricing</NavLink>
+        <NavLink to="/dashboard">Dashboard</NavLink>
       </li>
       <li>
         <NavLink>Be a Rider</NavLink>

@@ -7,7 +7,7 @@ import { useLoaderData } from "react-router";
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon-2x.png",
+    "https://static.vecteezy.com/system/resources/thumbnails/022/493/602/small_2x/location-pin-icon-3d-render-isolated-on-transparent-background-file-format-png.png",
   iconUrl:
     "https://static.vecteezy.com/system/resources/thumbnails/022/493/602/small_2x/location-pin-icon-3d-render-isolated-on-transparent-background-file-format-png.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",

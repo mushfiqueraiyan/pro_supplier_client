@@ -6,6 +6,10 @@ import Login from "../pages/Authentication/Login";
 import Register from "../pages/Authentication/Register";
 import Coverage from "../pages/coverage/Coverage.JSX";
 import AddParcel from "../pages/AddParcel/AddParcel";
+import DashboardLayout from "../layout/DashboardLayout";
+
+import MyParcels from "../pages/dashboard/MyParcels";
+import Payment from "../pages/dashboard/payments/Payment";
 
 export const router = createBrowserRouter([
   {
@@ -43,6 +47,20 @@ export const router = createBrowserRouter([
       {
         path: "/register",
         element: <Register />,
+      },
+    ],
+  },
+  {
+    path: "/dashboard",
+    element: <DashboardLayout />,
+    children: [
+      {
+        path: "myParcels",
+        element: <MyParcels />,
+      },
+      {
+        path: "payment/:id",
+        element: <Payment />,
       },
     ],
   },
