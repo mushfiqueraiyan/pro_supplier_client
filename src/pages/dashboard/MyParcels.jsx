@@ -11,7 +11,11 @@ const MyParcels = () => {
   const { data: parcels = [], refetch } = useQuery({
     queryKey: ["my-parcels", user],
     queryFn: async () => {
-      const res = await axiosSecure.get(`parcels?email=${user.email}`);
+      const res = await axiosSecure.get(`parcels?email=${user.email}`, {
+        headers: {
+          Authorization: `Bearer ${user.accessToken}`,
+        },
+      });
       return res.data;
     },
   });
@@ -77,7 +81,7 @@ const MyParcels = () => {
                   {parcel.payment_status === "unpaid" && (
                     <button
                       onClick={() => handlePay(parcel._id)}
-                      className="btn btn-xs btn-primary text-black"
+                      className="btn btn-xs btn-primary "
                     >
                       Pay
                     </button>

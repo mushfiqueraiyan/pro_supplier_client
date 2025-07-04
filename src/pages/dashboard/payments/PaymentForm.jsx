@@ -1,11 +1,35 @@
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
+import { useNavigate, useParams } from "react-router";
+import useAxiosSecure from "../../../hooks/AxiosSecure";
+import useAuth from "../../../hooks/GetAuth";
+import Swal from "sweetalert2";
 
 const PaymentForm = () => {
   const stripe = useStripe();
   const elements = useElements();
 
   const [error, setError] = useState("");
+
+  const axiosSecure = useAxiosSecure();
+
+  const { id } = useParams();
+
+  const { isPending, data: parcelInfo = {} } = useQuery({
+    queryKey: ["parcels", id],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`parcels/${id}`);
+      return res.data;
+    },
+  });
+
+  const amount = parcelInfo.cost;
+  const amountInCents = amount * 100;
+
+  const navigate = useNavigate();
+
+  const { user } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,6 +54,51 @@ const PaymentForm = () => {
     } else {
       setError("");
       console.log("PAYMENT: ", paymentMethod);
+
+      //create payment intent
+
+      const res = await axiosSecure.post("create-payment-intent", {
+        amountInCents,
+        id,
+      });
+
+      const clientSecret = res.data.clientSecret;
+
+      const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardElement),
+          billing_details: {
+            name: user.displayName,
+            email: user.email,
+          },
+        },
+      });
+
+      if (result.paymentIntent.status === "succeeded") {
+        const transactionId = result.paymentIntent.id;
+        const paymentData = {
+          parcelId: id,
+          email: user.email,
+          amount,
+          transactionId: transactionId,
+          paymentMethod: result.paymentIntent.payment_method_types[0],
+        };
+
+        const paymentRes = await axiosSecure.post("payments", paymentData);
+
+        if (paymentRes.data.insertedId) {
+          await Swal.fire({
+            icon: "success",
+            title: "Payment Successful!",
+            html: `<strong>Transaction ID:</strong> <code>${transactionId}</code>`,
+            confirmButtonText: "Go to My Parcels",
+          });
+
+          navigate("/dashboard/myParcels");
+        }
+      }
+
+      //console.log(res);
     }
   };
 
@@ -52,7 +121,7 @@ const PaymentForm = () => {
             type="submit"
             disabled={!stripe}
           >
-            Pay
+            Pay <span className="font-bold">${amount}</span>
           </button>
         </form>
       </div>

@@ -1,11 +1,15 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router";
 import useAuth from "../../hooks/GetAuth";
 import { updateProfile } from "firebase/auth";
+import { Upload, User } from "lucide-react";
+import axios from "axios";
 
 const Register = () => {
   const { createAccount, loader, setUser } = useAuth();
+  const [profileImg, setProfileImg] = useState("");
+  const fileInputRef = useRef(null);
 
   const {
     register,
@@ -20,12 +24,27 @@ const Register = () => {
 
     const userData = {
       displayName: name,
+      photoURL: profileImg,
     };
 
     createAccount(email, password)
-      .then((res) => {
+      .then(async (res) => {
         setUser(res.user);
-        console.log(res.user);
+        //console.log(res.user);
+
+        const userInfo = {
+          email: data.email,
+          role: "user",
+          name: data.name,
+          photo: profileImg,
+          created_at: new Date().toISOString(),
+        };
+
+        const userRes = await axios.post(
+          "http://localhost:3000/users",
+          userInfo
+        );
+
         updateProfile(res.user, userData)
           .then(() => {})
           .catch((err) => {
@@ -37,6 +56,23 @@ const Register = () => {
       });
   };
 
+  const handleProfileImage = async (e) => {
+    const image = e.target.files[0];
+    const formData = new FormData();
+    formData.append("image", image);
+
+    const res = await axios.post(
+      "https://api.imgbb.com/1/upload?key=898e44b732fe9177555b52db8dc098ff",
+      formData
+    );
+
+    setProfileImg(res.data.data.url);
+  };
+
+  const handleClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <div>
       <h1 className="text-5xl font-bold">Create an Account</h1>
@@ -46,6 +82,29 @@ const Register = () => {
         onSubmit={handleSubmit(onSubmit)}
         className="fieldset mt-10 mb-3 pr-0 md:pr-0 lg:pr-30"
       >
+        <div className="relative ">
+          <div
+            onClick={handleClick}
+            className=" w-15 h-15 rounded-full border-2 border-gray-300 overflow-hidden bg-gray-100 cursor-pointer group flex items-center justify-center"
+          >
+            <User size={48} className="text-gray-400" />
+
+            {/* Upload icon overlay */}
+            <div className="absolute inset-0 w-15 h-15 rounded-full bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+              <Upload size={24} className="text-white" />
+            </div>
+          </div>
+
+          {/* Hidden file input */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            className="hidden "
+            onChange={handleProfileImage}
+          />
+        </div>
+
         <label className="label">Name</label>
         <input
           type="text"

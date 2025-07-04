@@ -1,7 +1,31 @@
+import {
+  BikeIcon,
+  BoxIcon,
+  BoxSelect,
+  BoxSelectIcon,
+  CheckCircle,
+  CreditCard,
+  DollarSignIcon,
+  Home,
+  Package,
+  TrainTrack,
+  UserCog2,
+  UserPlus,
+  UserRoundCheck,
+  UserRoundX,
+} from "lucide-react";
 import React from "react";
 import { NavLink, Outlet } from "react-router";
+import useAuth from "../hooks/GetAuth";
+import useUserRole from "../hooks/useUserRole";
 
 const DashboardLayout = () => {
+  const { role, isLoading, refetch } = useUserRole();
+
+  // console.log(user);
+
+  refetch();
+
   return (
     <div>
       <div className="drawer lg:drawer-open">
@@ -43,14 +67,124 @@ const DashboardLayout = () => {
             className="drawer-overlay"
           ></label>
           <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
-            {/* Sidebar content here */}
+            <li>
+              <NavLink
+                to="/"
+                className="flex items-center gap-2 hover:text-blue-600 transition"
+              >
+                <Home size={18} />
+                Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/dashboard/myParcels"
+                className="flex items-center gap-2 hover:text-blue-600 transition"
+              >
+                <Package size={18} />
+                My Parcels
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/dashboard/transaction"
+                className="flex items-center gap-2 hover:text-blue-600 transition"
+              >
+                <CreditCard size={18} />
+                Transaction
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/dashboard/track-parcel"
+                className="flex items-center gap-2 hover:text-blue-600 transition"
+              >
+                <TrainTrack size={18} />
+                Track your parcel
+              </NavLink>
+            </li>
 
-            <li>
-              <NavLink to={"/"}>Home</NavLink>
-            </li>
-            <li>
-              <NavLink to="/dashboard/myParcels">My Parcels</NavLink>
-            </li>
+            {role === "admin" && (
+              <>
+                <li>
+                  <NavLink
+                    to="/dashboard/riders/pending"
+                    className="flex items-center gap-2 hover:text-blue-600 transition"
+                  >
+                    <UserCog2 size={18} />
+                    Pending Riders
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/dashboard/riders/active"
+                    className="flex items-center gap-2 hover:text-blue-600 transition"
+                  >
+                    <UserRoundCheck size={18} />
+                    Active Riders
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/dashboard/riders/deactiveRiders"
+                    className="flex items-center gap-2 hover:text-blue-600 transition"
+                  >
+                    <UserRoundX size={18} />
+                    Deactive Riders
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/dashboard/make-admin"
+                    className="flex items-center gap-2 hover:text-blue-600 transition"
+                  >
+                    <UserPlus size={18} />
+                    Make Admin
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/dashboard/Assign-Rider"
+                    className="flex items-center gap-2 hover:text-blue-600 transition"
+                  >
+                    <BikeIcon size={18} />
+                    Assign Rider
+                  </NavLink>
+                </li>
+              </>
+            )}
+
+            {role === "rider" && (
+              <>
+                <li>
+                  <NavLink
+                    to="/dashboard/pendingDelivery"
+                    className="flex items-center gap-2 hover:text-blue-600 transition"
+                  >
+                    <BoxIcon size={18} />
+                    Pending Delivery
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/dashboard/completedDelivery"
+                    className="flex items-center gap-2 hover:text-blue-600 transition"
+                  >
+                    <CheckCircle size={18} />
+                    Completed Delivery
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/dashboard/rider-earnings"
+                    className="flex items-center gap-2 hover:text-blue-600 transition"
+                  >
+                    <DollarSignIcon size={18} />
+                    Total Earning - Rider
+                  </NavLink>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>

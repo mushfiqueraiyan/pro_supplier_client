@@ -4,12 +4,20 @@ import useAuth from "../hooks/GetAuth";
 import { User } from "lucide-react";
 
 const Navbar = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout()
+      .then((res) => {})
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const navItems = (
     <>
       <li>
-        <NavLink>Services</NavLink>
+        <NavLink to={"/add-rider"}>Join as Rider</NavLink>
       </li>
       <li>
         <NavLink to={"/coverage"}>Coverage</NavLink>
@@ -62,9 +70,28 @@ const Navbar = () => {
         </div>
         <div className="navbar-end gap-3">
           {user ? (
-            <div className="bg-[#CAEB66] p-2 rounded-full">
-              <User />
-            </div>
+            <>
+              <div className="flex items-center gap-3">
+                <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-[#CAEB66] bg-gray-100 flex items-center justify-center">
+                  {user?.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt={user.displayName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="text-gray-500 w-6 h-6" />
+                  )}
+                </div>
+
+                <button
+                  onClick={handleLogout}
+                  className="btn btn-sm bg-[#CAEB66] border-none text-black hover:bg-[#b5d95d] transition"
+                >
+                  Logout
+                </button>
+              </div>
+            </>
           ) : (
             <>
               <Link to={"/login"} className="btn rounded-lg text-gray-600">
