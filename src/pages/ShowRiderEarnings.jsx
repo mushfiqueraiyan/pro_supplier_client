@@ -57,34 +57,41 @@ const ShowRiderEarnings = () => {
   const calculateRiderCut = (parcel) => {
     if (!warehouse || !parcel?.cost) return 0;
     const sameRegion =
-      parcel.receiverCenter?.toLowerCase() === warehouse.toLowerCase();
+      parcel.receiver_center?.toLowerCase() === warehouse.toLowerCase();
     const cost = parseInt(parcel.cost) || 0;
     return Math.round(cost * (sameRegion ? 0.8 : 0.3));
   };
+
+  // Helper to pick correct date
+  const parcelDate = (p) =>
+    p.delivered_at || p.pickedup_at || p.createdAt || null;
+
+  const isDateInRange = (iso, start) => (iso ? new Date(iso) >= start : false);
+
+  const isCashedOut = (p) => p.cashout_status === "cashed_out";
+  const isPendingCashout = (p) => p.cashout_status !== "cashed_out";
+
+  const isDeliveredToday = (p) =>
+    p.delivery_status === "delivered" &&
+    isDateInRange(parcelDate(p), startOfToday);
+
+  const isDeliveredThisMonth = (p) =>
+    p.delivery_status === "delivered" &&
+    isDateInRange(parcelDate(p), startOfMonth);
+
+  const isDeliveredThisYear = (p) =>
+    p.delivery_status === "delivered" &&
+    isDateInRange(parcelDate(p), startOfYear);
 
   const sumCuts = (filterFn) =>
     deliveries
       .filter(filterFn)
       .reduce((total, parcel) => total + calculateRiderCut(parcel), 0);
 
-  const isCashedOut = (p) => p.cashout_status === "cashed_out";
-  const isPendingCashout = (p) => p.cashout_status !== "cashed_out";
-
-  const isDateInRange = (date, start) => {
-    if (!date) return false;
-    return new Date(date) >= start;
-  };
-
   const totalEarnings = sumCuts(isCashedOut);
-  const todaysEarnings = sumCuts(
-    (p) => isCashedOut(p) && isDateInRange(p.creation_date, startOfToday)
-  );
-  const monthEarnings = sumCuts(
-    (p) => isCashedOut(p) && isDateInRange(p.creation_date, startOfMonth)
-  );
-  const yearEarnings = sumCuts(
-    (p) => isCashedOut(p) && isDateInRange(p.creation_date, startOfYear)
-  );
+  const todaysEarnings = sumCuts(isDeliveredToday);
+  const monthEarnings = sumCuts(isDeliveredThisMonth);
+  const yearEarnings = sumCuts(isDeliveredThisYear);
   const pendingEarnings = sumCuts(isPendingCashout);
 
   // 4️⃣ UI States
@@ -112,7 +119,7 @@ const ShowRiderEarnings = () => {
 
   // 5️⃣ Final Render
   return (
-    <div className=" p-6">
+    <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">📈 Rider Earnings Dashboard</h1>
       <p className="text-sm text-gray-500 mb-4">Warehouse: {warehouse}</p>
 

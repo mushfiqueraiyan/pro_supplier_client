@@ -24,6 +24,7 @@ import CompletedDelivery from "../pages/CompletedDelivery";
 import PendingDelivery from "../pages/PendingDelivery";
 import ShowRiderEarnings from "../pages/ShowRiderEarnings";
 import TrackingParcel from "../pages/tracking/TrackingParcel";
+import DashboardHome from "../pages/dashboard/DashboardHome";
 
 export const router = createBrowserRouter([
   {
@@ -94,6 +95,10 @@ export const router = createBrowserRouter([
       </PrivateRoutes>
     ),
     children: [
+      {
+        index: true,
+        element: <DashboardHome />,
+      },
       {
         path: "myParcels",
         element: (
